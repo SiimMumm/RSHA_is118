@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# phpMyAdmin paigaldaja
+
+echo "phpMyAdmin paigaldus"
+echo "=================================================="
+
+if [ $uid -ne 0 ]; then
+	echo "Tuleb käivitada rootina!" 1>&2
+	exit 1
+else
+	#PhpMyAdmin olemasolu kontroll
+	myadmin=$(dpkg-query -W -f='${status}' phpmyadmin | grep -c 'ok installed')
+
+	# Juhul kui ei ole siis...
+	if [ $myadmin -eq 0 ]; then
+		echo "phpMyAdmin'i pole peale paigaldatud. Seega installime..."
+		echo "=================================================="
+
+		# Värskenab ja installib phpMyAdmin
+		# Pead tegema valikuid
+		apt-get update && apt-get upgrade
+		apt-get install -y phpmyadmin
+
+		echo "Kontrollime, kas phpmyadmin on peale paigaldatud..."
+		echo "=================================================="
+
+		adm=$(dpkg-query -W -f='${status}' phpmyadmin | grep -c 'ok installed')
+		if [ $adm -eq 1 ]; then
+			echo "phpMyAdmin edukalt paigaldatud!"
+			exit 0
+		else
+			echo "Midagi läks viltu! Palun proovi uuesti, installimine ei olnud edukas."
+			exit 1
+		fi
+	else
+		echo "phpMyAdmin on juba peale paigaldatud!"
+		exit 0
+	fi
+fi
+
+#Fin
